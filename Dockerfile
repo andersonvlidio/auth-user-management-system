@@ -1,4 +1,4 @@
-FROM node:22 AS production-builder
+FROM node:22 AS builder
 
 WORKDIR /app
 
@@ -12,7 +12,7 @@ RUN npm run build
 
 FROM nginx:alpine AS nginx
 
-COPY --from=production-builder /app/dist /usr/share/nginx/html
+COPY --from=builder /app/dist /usr/share/nginx/html
 
 EXPOSE 80
 
