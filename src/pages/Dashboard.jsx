@@ -25,7 +25,7 @@ export default function Dashboard() {
 
     const fetchUsers = async () => {
       try {
-        const response = await axios.get('http://localhost:3333/api/users', {
+        const response = await axios.get(`https://auth-user-management-system-api.onrender.com/api/users`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -51,8 +51,9 @@ export default function Dashboard() {
 
   const handleDeleteUser = async (id) => {
     if (window.confirm('Tem certeza que deseja excluir este usuário?')) {
+
       try {
-        await axios.delete(`http://localhost:3333/api/users/delete/${id}`, {
+        await axios.delete(`https://auth-user-management-system-api.onrender.com/api/users/delete/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

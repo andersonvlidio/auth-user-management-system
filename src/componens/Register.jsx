@@ -45,7 +45,7 @@ const Register = ({ onSuccess }) => {
 
     try {
       debugger;
-      const url = 'http://localhost:3333/api/users';
+      const url = 'https://auth-user-management-system-api.onrender.com/api/users';
 
       await axios.post(url, {
         name: name.trim(),

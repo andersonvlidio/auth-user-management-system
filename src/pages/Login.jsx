@@ -13,7 +13,8 @@ export default function Login() {
     setError('');
 
     try {
-      const url = 'http://localhost:3333/api/auth/login';
+      const url = 'https://auth-user-management-system-api.onrender.com/api/auth/login';
+
       const response = await axios.post(
         url,
         { email, password }

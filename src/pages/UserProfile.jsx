@@ -27,7 +27,7 @@ export default function EditUser() {
 
         const fetchUser = async () => {
             try {
-                const response = await axios.get(`http://localhost:3333/api/auth/profile/${id}`, {
+                const response = await axios.get(`https://auth-user-management-system-api.onrender.com/api/auth/profile/${id}` , {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 const { name, email, cpf, birthDate } = response.data;
@@ -52,7 +52,7 @@ export default function EditUser() {
         setSuccess('');
 
         try {
-            await axios.put(`http://localhost:3333/api/users/${id}`, form, {
+            await axios.put(`https://auth-user-management-system-api.onrender.com/api/users/${id}`, form, {
                 headers: { Authorization: `Bearer ${token}` },
             });
 
@@ -67,7 +67,7 @@ export default function EditUser() {
     const handleDeleteUser = async (id) => {
         if (window.confirm('Tem certeza que deseja excluir este usuário?')) {
             try {
-                await axios.delete(`http://localhost:3333/api/users/delete/${id}`, {
+                await axios.delete(`https://auth-user-management-system-api.onrender.com/api/users/delete/${id}`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
