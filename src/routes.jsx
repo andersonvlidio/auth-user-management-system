@@ -1,15 +1,17 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import Home from './pages/Home';
+import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
+import UserProfile from './pages/UserProfile';
 
 const NavRoutes = () => {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="*" element={<Navigate to="/home" />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/" element={<Dashboard />} />
+        <Route path="*" element={<Navigate to="/" />} />
+        <Route path="/userprofile/:id" element={<UserProfile />} />
       </Routes>
     </BrowserRouter>
   );
