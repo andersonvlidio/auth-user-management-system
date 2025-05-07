@@ -1,12 +1,67 @@
-# React + Vite
+# Auth User Management System - Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Este é o frontend do sistema de gerenciamento de usuários com autenticação (Auth User Management System). A aplicação foi construída com **React** e **Bootstrap 5**, e oferece um painel para dois tipos de usuários: `ADMIN` e `VISUALIZADOR`, com controle de acesso e interface amigável.
 
-Currently, two official plugins are available:
+## ⚙️ Funcionalidades
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Autenticação via JWT
+- Controle de acesso baseado em perfil (`ADMIN` e `VISUALIZADOR`)
+- Cadastro e login de usuários
+- Visualização da lista de usuários
+- Permissões:
+  - **ADMIN**: pode criar, editar e deletar qualquer usuário
+  - **VISUALIZADOR**: pode apenas visualizar os usuários
 
-## Expanding the ESLint configuration
+## 🧪 Tecnologias Utilizadas
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- [React](https://reactjs.org/)
+- [Bootstrap 5](https://getbootstrap.com/)
+- [React Router DOM](https://reactrouter.com/)
+- [Axios](https://axios-http.com/)
+- [JWT](https://jwt.io/)
+- [Docker](https://www.docker.com/)
+
+## 🌐 Deploy
+
+A aplicação está em produção com deploy automático na [Vercel](https://vercel.com/)
+
+🔗 **Link de produção:** [auth-user-management-system](https://auth-user-management-system.vercel.app/)  
+
+## 🚀 Instalação
+
+### 1. Clonar o repositório
+
+```
+git clone https://github.com/andersonvlidio/auth-user-management-system.git
+cd auth-user-management-system-frontend 
+```
+
+### 2. Instalar dependências
+```
+npm install
+```
+### 3. Configurar variáveis de ambiente
+Crie um arquivo .env na raiz do projeto com:
+
+```
+VITE_API_URL=http://localhost:3333  (Para usar back-end Local)
+VITE_API_URL=https://auth-user-management-system-api.onrender.com (Para usar a api de Produção)
+```
+### 4. Iniciar o projeto
+```
+npm run dev
+````
+
+## Estrutura de Pastas
+```bash
+
+src/
+├── assets/
+├── components/
+├── pages/
+├── utils/ 
+App.jsx
+index.css
+main.jsx
+routes/
+```
