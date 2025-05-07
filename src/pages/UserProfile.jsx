@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 
+import backIcon from '../assets/box-arrow-left.svg';
+
 export default function EditUser() {
     const { id } = useParams();
     const navigate = useNavigate();
@@ -25,20 +27,20 @@ export default function EditUser() {
             return;
         }
 
-        const fetchUser = async () => {
+        const getUser = async () => {
             try {
-                const response = await axios.get(`https://auth-user-management-system-api.onrender.com/api/auth/profile/${id}` , {
+                const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/auth/profile/${id}`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 const { name, email, cpf, birthDate } = response.data;
                 setForm({ name, email, cpf, birthDate: birthDate.split('T')[0] });
-            } catch (err) {
-                console.error('Erro ao buscar usuário:', err);
+            } catch (error) {
+                console.error('Erro ao buscar usuário:', error.response.data.error);
                 setError('Erro ao carregar dados do usuário');
             }
         };
 
-        fetchUser();
+        getUser();
     }, [id, token, navigate]);
 
     const handleChange = (e) => {
@@ -52,22 +54,22 @@ export default function EditUser() {
         setSuccess('');
 
         try {
-            await axios.put(`https://auth-user-management-system-api.onrender.com/api/users/${id}`, form, {
+            await axios.put(`${import.meta.env.VITE_API_URL}/api/users/${id}`, form, {
                 headers: { Authorization: `Bearer ${token}` },
             });
 
             setSuccess('Usuário atualizado com sucesso!');
             setTimeout(() => navigate('/dashboard'), 1000);
-        } catch (err) {
-            const msg = err.response?.data?.error || 'Erro ao atualizar usuário';
-            setError(msg);
+        } catch (error) {
+            const message = error.response.data.error || 'Erro ao atualizar usuário';
+            setError(message);
         }
     };
 
     const handleDeleteUser = async (id) => {
         if (window.confirm('Tem certeza que deseja excluir este usuário?')) {
             try {
-                await axios.delete(`https://auth-user-management-system-api.onrender.com/api/users/delete/${id}`, {
+                await axios.delete(`${import.meta.env.VITE_API_URL}/api/users/delete/${id}`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
@@ -80,94 +82,114 @@ export default function EditUser() {
                 setSuccess('Usuário excluído com sucesso!');
                 navigate('/');
 
-            } catch (err) {
-                console.error('Erro ao excluir usuário:', err);
+            } catch (error) {
+                const message = error.response.data.error || 'Erro ao excluir usuário';
+                setError(message);
             }
         }
     }
 
     return (
-        <div className="container mt-5 shadow-sm p-3 mb-5 bg-body rounded" style={{ maxWidth: 600 }}>
-            <h3 className="mb-4">Editar Usuário</h3>
-            <form onSubmit={handleSubmit}>
-                <div className="form-floating mb-3">
-                    <input 
-                        className="form-control rounded-pill" 
-                        name="name" 
-                        placeholder="Nome" 
-                        value={form.name} 
-                        onChange={handleChange} 
-                        required 
-                    />
-                    <label>Nome</label>
-                </div>
+        <div className="d-flex flex-column justify-content-center h-100">
+            <div className="container mt-5 shadow-sm p-3 mb-5 bg-body rounded" style={{ maxWidth: 600 }}>
 
-                <div className="form-floating mb-3">
-                    <input 
-                        className="form-control rounded-pill" 
-                        name="email" 
-                        placeholder="Email" 
-                        value={form.email} 
-                        onChange={handleChange} 
-                        required 
+                <button 
+                    className='btn' 
+                    data-bs-toggle="tooltip"
+                    data-bs-placement="top"
+                    title="Voltar"
+                >
+                    <img
+                        src={backIcon}
+                        alt="Voltar"
+                        className="img-fluid"
+                        width={24}
+                        onClick={() => navigate('/dashboard')}
                     />
-                    <label>Email</label>
-                </div>
+                </button>
 
-                <div className="form-floating mb-3">
-                    <input 
-                        className="form-control rounded-pill" 
-                        name="cpf" 
-                        placeholder="CPF" 
-                        value={form.cpf} 
-                        onChange={handleChange} 
-                        required 
-                    />
-                    <label>CPF</label>
-                </div>
-
-                <div className="form-floating mb-3">
-                    <input 
-                        type="date" 
-                        className="form-control rounded-pill" 
-                        name="birthDate" 
-                        placeholder="Data de Nascimento" 
-                        value={form.birthDate} 
-                        onChange={handleChange} 
-                        required 
-                    />
-                    <label>Data de Nascimento</label>
-                </div>
-                {error && <div className="alert alert-danger">{error}</div>}
-                {success && <div className="alert alert-success">{success}</div>}
-
-                <div className="d-flex justify-content-between align-items-center">
-                    <div>
-                        <button 
-                            type="submit" 
-                            className="btn btn-outline-success rounded-pill fw-bolder"
-                        >
-                            Salvar
-                        </button>
-                        <button 
-                            type="button" 
-                            className="btn btn-outline-secondary ms-2 rounded-pill fw-bolder" 
-                            onClick={() => navigate('/dashboard')}
-                        >
-                            Voltar
-                        </button>
+                <h3 className="mb-5 d-flex justify-content-center">Editar Usuário</h3>
+                <form onSubmit={handleSubmit}>
+                    <div className="form-floating mb-3">
+                        <input
+                            className="form-control rounded-pill"
+                            name="name"
+                            placeholder="Nome"
+                            value={form.name}
+                            onChange={handleChange}
+                            required
+                        />
+                        <label>Nome</label>
                     </div>
-                    <div>
-                        <button 
-                            type="button" 
-                            className="btn btn-outline-danger ms-2 rounded-pill fw-bolder" 
-                            onClick={() => handleDeleteUser(id)}
-                        >
-                            Excluir Usuário
-                        </button>
+
+                    <div className="form-floating mb-3">
+                        <input
+                            className="form-control rounded-pill"
+                            name="email"
+                            placeholder="Email"
+                            value={form.email}
+                            onChange={handleChange}
+                            required
+                        />
+                        <label>Email</label>
                     </div>
-                </div>
-            </form>
+
+                    <div className="form-floating mb-3">
+                        <input
+                            className="form-control rounded-pill"
+                            name="cpf"
+                            placeholder="CPF"
+                            value={form.cpf}
+                            maxLength={11}
+                            onChange={handleChange}
+                            required
+                        />
+                        <label>CPF</label>
+                    </div>
+
+                    <div className="form-floating mb-3">
+                        <input
+                            type="date"
+                            className="form-control rounded-pill"
+                            name="birthDate"
+                            placeholder="Data de Nascimento"
+                            value={form.birthDate}
+                            onChange={handleChange}
+                            required
+                        />
+                        <label>Data de Nascimento</label>
+                    </div>
+                    {error && <div className="alert alert-danger">{error}</div>}
+                    {success && <div className="alert alert-success">{success}</div>}
+
+                    <div className="d-flex justify-content-between align-items-center">
+                        <div>
+                            <button
+                                type="submit"
+                                className="btn btn-outline-success rounded-pill fw-bolder"
+                            >
+                                Salvar
+                            </button>
+                            <button
+                                type="button"
+                                className="btn btn-outline-secondary ms-2 rounded-pill fw-bolder"
+                                onClick={() => navigate('/dashboard')}
+                            >
+                                Voltar
+                            </button>
+                        </div>
+                        <div>
+                            <button
+                                type="button"
+                                className="btn btn-outline-danger ms-2 rounded-pill fw-bolder"
+                                onClick={() => handleDeleteUser(id)}
+                            >
+                                Excluir Usuário
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
         </div>
     );
 }

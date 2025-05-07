@@ -13,7 +13,7 @@ export default function Login() {
     setError('');
 
     try {
-      const url = 'https://auth-user-management-system-api.onrender.com/api/auth/login';
+      const url = `${import.meta.env.VITE_API_URL}/api/auth/login`;
 
       const response = await axios.post(
         url,
@@ -26,8 +26,8 @@ export default function Login() {
       localStorage.setItem('user', JSON.stringify(user));
 
       navigate('/dashboard');
-    } catch (err) {
-      const message = err.response?.data?.message || 'Erro ao fazer login';
+    } catch (error) {
+      const message = error.response.data.error || 'Erro ao fazer login';
       setError(message);
     }
   };

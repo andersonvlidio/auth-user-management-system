@@ -2,7 +2,7 @@ import Routes from './routes';
 
 function App() {
   return (
-    <div className='app'>
+    <div className='app vh-100'>
         <Routes/>
       </div>
   )

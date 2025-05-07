@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import RegisterModal from '../componens/RegisterModal';
 import userProfileIcon from '../assets/userProfileIcon.svg';
 
 import deleteIcon from '../assets/deleteIcon.svg';
@@ -11,7 +10,8 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const [users, setUsers] = useState([]);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [showRegisterModal, setShowRegisterModal] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
   const token = localStorage.getItem('token');
   const user = JSON.parse(localStorage.getItem('user'));
@@ -23,20 +23,21 @@ export default function Dashboard() {
       return;
     }
 
-    const fetchUsers = async () => {
+    const getUsers = async () => {
       try {
-        const response = await axios.get(`https://auth-user-management-system-api.onrender.com/api/users`, {
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/users`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
         setUsers(response.data);
-      } catch (err) {
-        console.error('Erro ao buscar usuários:', err);
+      } catch (error) {
+        const message = error.response.data.error || 'Erro ao buscar usuários';
+        setError(message);
       }
     };
 
-    fetchUsers();
+    getUsers();
   }, [token, navigate]);
 
   const handleLogout = () => {
@@ -49,28 +50,35 @@ export default function Dashboard() {
     navigate(`/userprofile/${id}`);
   };
 
+  const handleCreateUser = () => {
+    navigate('/register');
+  }
+
   const handleDeleteUser = async (id) => {
+    setError('');
     if (window.confirm('Tem certeza que deseja excluir este usuário?')) {
 
       try {
-        await axios.delete(`https://auth-user-management-system-api.onrender.com/api/users/delete/${id}`, {
+        await axios.delete(`${import.meta.env.VITE_API_URL}/api/users/delete/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
+        setSuccess('Usuário excluído com sucesso!');
         setUsers(users.filter((user) => user.id !== id));
-      } catch (err) {
-        console.error('Erro ao excluir usuário:', err);
+      } catch (error) {
+        const message = error.response.data.error || 'Erro ao excluir usuário';
+        setError(message);
       }
     }
   }
 
   return (
-    <div className="container mt-4">
+    <div className="container h-100 mt-4 d-flex flex-column justify-content-center">
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h3>Bem-vindo, {user?.name}</h3>
 
-        <div className="position-relative">
+        <div className=" btn position-relative">
           <img
             src={userProfileIcon}
             className="rounded-circle"
@@ -79,9 +87,9 @@ export default function Dashboard() {
             onClick={() => setMenuOpen(!menuOpen)}
           />
           {menuOpen && (
-            <div className="position-absolute end-0 mt-2 p-3 rounded bg-white shadow" style={{ zIndex: 10 }}>
-              <p className="mb-1"><strong>{user.name}</strong></p>
-              <p className="mb-2 text-muted">{user.role}</p>
+            <div className="position-absolute end-0 mt-2 p-3 rounded bg-white shadow" style={{ zIndex: 10, minWidth:"150px" }}>
+              <p className="mb-2"><strong>{user.name}</strong></p>
+              <p className="mb-3 text-muted">({user.role})</p>
               {isAdmin && (
               <button className="btn btn-sm btn-outline-primary w-100 mb-2 rounded-pill fw-bolder" onClick={() => handleEditUser(user.id)}>UserProfile</button>
               )}
@@ -94,10 +102,9 @@ export default function Dashboard() {
         <h4>Lista de Usuários</h4>
         {isAdmin && (
           <>
-            <button className="btn btn-outline-success mb-3 rounded-pill fw-bolder" onClick={() => setShowRegisterModal(true)}>
+            <button className="btn btn-outline-success mb-3 rounded-pill fw-bolder" onClick={handleCreateUser}>
               Adicionar Usuário
             </button>
-            <RegisterModal show={showRegisterModal} onClose={() => setShowRegisterModal(false)} />
           </>
         )}
 
@@ -105,14 +112,14 @@ export default function Dashboard() {
       <table className="table table-hover mt-3 shadow rounded-3">
         <thead>
           <tr>
-            <th>Nome</th>
-            <th>Email</th>
-            <th>CPF</th>
-            <th>Data de Nascimento</th>
-            <th>Data de Registro</th>
-            <th>Níveis de Acesso</th>
+            <th className='fw-bolder'>Nome</th>
+            <th className='fw-bolder'>Email</th>
+            <th className='fw-bolder'>CPF</th>
+            <th className='fw-bolder'>Data de Nascimento</th>
+            <th className='fw-bolder'>Data de Registro</th>
+            <th className='fw-bolder'>Níveis de Acesso</th>
 
-            {isAdmin && <th>Ações</th>}
+            {isAdmin && <th className='fw-bolder'>Ações</th>}
           </tr>
         </thead>
         <tbody>
@@ -127,7 +134,7 @@ export default function Dashboard() {
               {isAdmin && (
                 <td>
                   <button 
-                    className="btn btn-outline-primary me-2"
+                    className="btn me-2"
                     data-bs-toggle="tooltip" 
                     data-bs-placement="top" 
                     title="Editar Usuário"
@@ -136,7 +143,7 @@ export default function Dashboard() {
                     <img src={editIcon} alt="" />
                   </button>
                   <button
-                    className="btn btn-outline-danger"
+                    className="btn"
                     data-bs-toggle="tooltip" 
                     data-bs-placement="top" 
                     title="Excluir Usuário"
@@ -150,6 +157,8 @@ export default function Dashboard() {
           ))}
         </tbody>
       </table>
+      {error && <div className="alert alert-danger">{error}</div>}
+      {success && <div className="alert alert-success">{success}</div>}
     </div>
   );
 }
