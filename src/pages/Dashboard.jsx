@@ -1,8 +1,10 @@
+/* eslint-disable no-debugger */
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import userProfileIcon from '../assets/userProfileIcon.svg';
+import DeleteModal from '../components/DeleteModal';
 
+import userProfileIcon from '../assets/userProfileIcon.svg';
 import deleteIcon from '../assets/deleteIcon.svg';
 import editIcon from '../assets/editIcon.svg';
 
@@ -12,6 +14,8 @@ export default function Dashboard() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [userIdToDelete, setUserIdToDelete] = useState(null);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   const token = localStorage.getItem('token');
   const user = JSON.parse(localStorage.getItem('user'));
@@ -54,27 +58,43 @@ export default function Dashboard() {
     navigate('/register');
   }
 
-  const handleDeleteUser = async (id) => {
-    setError('');
-    if (window.confirm('Tem certeza que deseja excluir este usuário?')) {
+  const handleOpenConfirmModal = (id) => {
+    setUserIdToDelete(id);
+    setShowConfirmModal(true);
+  };
 
-      try {
-        await axios.delete(`${import.meta.env.VITE_API_URL}/api/users/delete/${id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        setSuccess('Usuário excluído com sucesso!');
-        setUsers(users.filter((user) => user.id !== id));
-      } catch (error) {
-        const message = error.response.data.error || 'Erro ao excluir usuário';
-        setError(message);
-      }
+
+  const handleDeleteUser = async (id) => {
+    debugger;
+    setError('');
+    setUserIdToDelete(id);
+    setShowConfirmModal(true);
+
+    try {
+      await axios.delete(`${import.meta.env.VITE_API_URL}/api/users/delete/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setSuccess('Usuário excluído com sucesso!');
+      setUsers(users.filter((user) => user.id !== id));
+    } catch (error) {
+      const message = error.response.data.error || 'Erro ao excluir usuário';
+      setError(message);
+    } finally {
+      setShowConfirmModal(false);
     }
+
   }
 
   return (
     <div className="container h-100 mt-4 d-flex flex-column justify-content-center">
+      <DeleteModal
+        show={showConfirmModal}
+        onClose={() => setShowConfirmModal(false)}
+        onConfirm={() => handleDeleteUser(userIdToDelete)}
+        name={users.find(user => user.id === userIdToDelete)?.name}
+      />
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h3>Bem-vindo, {user?.name}</h3>
 
@@ -87,11 +107,11 @@ export default function Dashboard() {
             onClick={() => setMenuOpen(!menuOpen)}
           />
           {menuOpen && (
-            <div className="position-absolute end-0 mt-2 p-3 rounded bg-white shadow" style={{ zIndex: 10, minWidth:"150px" }}>
+            <div className="position-absolute end-0 mt-2 p-3 rounded bg-white shadow" style={{ zIndex: 10, minWidth: "150px" }}>
               <p className="mb-2"><strong>{user.name}</strong></p>
               <p className="mb-3 text-muted">({user.role})</p>
               {isAdmin && (
-              <button className="btn btn-sm btn-outline-primary w-100 mb-2 rounded-pill fw-bolder" onClick={() => handleEditUser(user.id)}>UserProfile</button>
+                <button className="btn btn-sm btn-outline-primary w-100 mb-2 rounded-pill fw-bolder" onClick={() => handleEditUser(user.id)}>UserProfile</button>
               )}
               <button className="btn btn-sm btn-outline-danger w-100 rounded-pill fw-bolder" onClick={handleLogout}>Sair</button>
             </div>
@@ -133,23 +153,23 @@ export default function Dashboard() {
               <td>{userprofile.role}</td>
               {isAdmin && (
                 <td>
-                  <button 
+                  <button
                     className="btn me-2"
-                    data-bs-toggle="tooltip" 
-                    data-bs-placement="top" 
+                    data-bs-toggle="tooltip"
+                    data-bs-placement="top"
                     title="Editar Usuário"
                     onClick={() => handleEditUser(userprofile.id)}
-                  > 
-                    <img src={editIcon} alt="" />
+                  >
+                    <img src={editIcon} alt="Editar Usuário" />
                   </button>
                   <button
                     className="btn"
-                    data-bs-toggle="tooltip" 
-                    data-bs-placement="top" 
+                    data-bs-toggle="tooltip"
+                    data-bs-placement="top"
                     title="Excluir Usuário"
-                    onClick={() => handleDeleteUser(userprofile.id)}
-                  > 
-                    <img src={deleteIcon} alt="" srcset="" />
+                    onClick={() => handleOpenConfirmModal(userprofile.id)}
+                  >
+                    <img src={deleteIcon} alt="Deletar Usuário" />
                   </button>
                 </td>
               )}

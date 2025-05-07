@@ -1,10 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
+import DeleteModal from '../components/DeleteModal';
 
 import backIcon from '../assets/box-arrow-left.svg';
 
 export default function EditUser() {
+    const [userIdToDelete, setUserIdToDelete] = useState(null);
+    const [showConfirmModal, setShowConfirmModal] = useState(false);
+
     const { id } = useParams();
     const navigate = useNavigate();
     const token = localStorage.getItem('token');
@@ -66,35 +70,49 @@ export default function EditUser() {
         }
     };
 
+    const handleOpenConfirmModal = (id) => {
+        setUserIdToDelete(id);
+        setShowConfirmModal(true);
+    };
+
+
     const handleDeleteUser = async (id) => {
-        if (window.confirm('Tem certeza que deseja excluir este usuário?')) {
-            try {
-                await axios.delete(`${import.meta.env.VITE_API_URL}/api/users/delete/${id}`, {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
+        setUserIdToDelete(id);
+        setShowConfirmModal(true);
+        try {
+            await axios.delete(`${import.meta.env.VITE_API_URL}/api/users/delete/${id}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
 
-                if (currentUser.id === id) {
-                    localStorage.removeItem('token');
-                    localStorage.removeItem('user');
-                }
-                setSuccess('Usuário excluído com sucesso!');
-                navigate('/');
-
-            } catch (error) {
-                const message = error.response.data.error || 'Erro ao excluir usuário';
-                setError(message);
+            if (currentUser.id === id) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
             }
+            setSuccess('Usuário excluído com sucesso!');
+            navigate('/');
+
+        } catch (error) {
+            const message = error.response.data.error || 'Erro ao excluir usuário';
+            setError(message);
+        } finally {
+            setShowConfirmModal(false);
         }
+
     }
 
     return (
         <div className="d-flex flex-column justify-content-center h-100">
+            <DeleteModal
+                show={showConfirmModal}
+                onClose={() => setShowConfirmModal(false)}
+                onConfirm={() => handleDeleteUser(userIdToDelete)}
+            />
             <div className="container mt-5 shadow-sm p-3 mb-5 bg-body rounded" style={{ maxWidth: 600 }}>
 
-                <button 
-                    className='btn' 
+                <button
+                    className='btn'
                     data-bs-toggle="tooltip"
                     data-bs-placement="top"
                     title="Voltar"
@@ -170,19 +188,12 @@ export default function EditUser() {
                             >
                                 Salvar
                             </button>
-                            <button
-                                type="button"
-                                className="btn btn-outline-secondary ms-2 rounded-pill fw-bolder"
-                                onClick={() => navigate('/dashboard')}
-                            >
-                                Voltar
-                            </button>
                         </div>
                         <div>
                             <button
                                 type="button"
                                 className="btn btn-outline-danger ms-2 rounded-pill fw-bolder"
-                                onClick={() => handleDeleteUser(id)}
+                                onClick={() => handleOpenConfirmModal(id)}
                             >
                                 Excluir Usuário
                             </button>
