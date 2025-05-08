@@ -6,6 +6,8 @@ export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -50,7 +52,7 @@ export default function Login() {
         </div>
         <div className="form-floating mb-3">
           <input
-            type="password"
+            type={showPassword ? 'text' : 'password'}
             className="form-control rounded-pill"
             id="floatingInput"
             placeholder="Senha"
@@ -59,7 +61,20 @@ export default function Login() {
             required
           />
           <label className="form-label">Senha</label>
+          <div className="form-check mt-1">
+            <input
+              type="checkbox"
+              className="form-check-input"
+              checked={showPassword}
+              onChange={() => setShowPassword(!showPassword)}
+              id="showPassword"
+            />
+            <label className="form-check-label" htmlFor="showPassword">
+              Exibir senha
+            </label>
+          </div>
         </div>
+        
         {error && <div className="alert alert-danger">{error}</div>}
         <button type="submit" className="btn btn-outline-primary w-100 rounded-pill fw-bolder mb-4">Entrar</button>
       </form>

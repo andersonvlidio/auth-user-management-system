@@ -8,6 +8,8 @@ import backIcon from '../assets/box-arrow-left.svg';
 export default function EditUser() {
     const [userIdToDelete, setUserIdToDelete] = useState(null);
     const [showConfirmModal, setShowConfirmModal] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+    const [showNewPassword, setShowNewPassword] = useState(false);
 
     const { id } = useParams();
     const navigate = useNavigate();
@@ -19,8 +21,8 @@ export default function EditUser() {
         email: '',
         cpf: '',
         birthDate: '',
-        password: '',
-        confirmPassword: '',
+        oldPassword: '',
+        newPassword: '',
     });
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
@@ -53,9 +55,13 @@ export default function EditUser() {
     };
 
     const handleSubmit = async (e) => {
+        // eslint-disable-next-line no-debugger
+        debugger
         e.preventDefault();
         setError('');
         setSuccess('');
+
+        console.log('Form data:', form);
 
         try {
             await axios.put(`${import.meta.env.VITE_API_URL}/api/users/${id}`, form, {
@@ -176,6 +182,53 @@ export default function EditUser() {
                             required
                         />
                         <label>Data de Nascimento</label>
+                    </div>
+
+                    <div className="form-floating mb-3">
+                        <input
+                            type={showPassword ? 'text' : 'password'}
+                            className="form-control rounded-pill"
+                            name="oldPassword"
+                            placeholder="Senha"
+                            value={form.oldPassword}
+                            onChange={handleChange}
+                        />
+                        <label>Nova Senha</label>
+                        <div className="form-check mt-1">
+                            <input
+                                type="checkbox"
+                                className="form-check-input"
+                                checked={showPassword}
+                                onChange={() => setShowPassword(!showPassword)}
+                                id="showPassword"
+                            />
+                            <label className="form-check-label" htmlFor="showPassword">
+                                Exibir senha
+                            </label>
+                        </div>
+                    </div>
+                    <div className="form-floating mb-3">
+                        <input
+                            type={showNewPassword ? 'text' : 'password'}
+                            className="form-control rounded-pill"
+                            name="newPassword"
+                            placeholder="Confirmar Senha"
+                            value={form.newPassword}
+                            onChange={handleChange}
+                        />
+                        <label>Confirmar Senha</label>
+                        <div className="form-check mt-1">
+                            <input
+                                type="checkbox"
+                                className="form-check-input"
+                                checked={showNewPassword}
+                                onChange={() => setShowNewPassword(!showNewPassword)}
+                                id="showPassword"
+                            />
+                            <label className="form-check-label" htmlFor="showPassword">
+                                Exibir senha
+                            </label>
+                        </div>
                     </div>
                     {error && <div className="alert alert-danger">{error}</div>}
                     {success && <div className="alert alert-success">{success}</div>}

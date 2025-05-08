@@ -1,4 +1,3 @@
-/* eslint-disable no-debugger */
 import axios from 'axios';
 import React, { useState } from 'react';
 import { isValidCPF, isValidBirthDate } from '../utils/functionsUtils';
@@ -47,7 +46,6 @@ const Register = ({ onSuccess }) => {
     }
 
     try {
-      debugger;
       await axios.post(`${import.meta.env.VITE_API_URL}/api/users`, {
         name: name.trim(),
         cpf: cpf.replace(/\D/g, ''),
